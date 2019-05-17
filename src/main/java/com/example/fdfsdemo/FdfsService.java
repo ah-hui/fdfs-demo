@@ -4,6 +4,7 @@ import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.domain.proto.storage.DownloadByteArray;
 import com.github.tobato.fastdfs.service.DefaultFastFileStorageClient;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -90,6 +91,17 @@ public class FdfsService {
         try {
             os.write(downloadFile(path));
         } catch (IOException e) {
+            e.printStackTrace();
+            log.error("FastDFS下载失败！path=[{}]", path);
+            throw new FdfsFailException(String.format("FastDFS下载失败！path=[{}]", path));
+        }
+    }
+
+    public void downloadFile(String path, String targetPath) throws IOException {
+        try {
+            byte[] bytes = downloadFile(path);
+            IOUtils.write(bytes, new FileOutputStream(targetPath));
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("FastDFS下载失败！path=[{}]", path);
             throw new FdfsFailException(String.format("FastDFS下载失败！path=[{}]", path));
